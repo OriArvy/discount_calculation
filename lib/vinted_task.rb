@@ -135,6 +135,14 @@ rescue ArgumentError
   false
 end
 
+def structured_response(items)
+  array = []
+  items.each do |item|
+    array << "#{item['Date']} #{item['PackageSize']} #{item['Provider']} #{item['FinalPrice']} #{item['Discount']}"
+  end
+  puts array
+end
+
 set_price(structured_transactions_array)
 add_discount_field(structured_transactions_array)
 add_final_price_field(structured_transactions_array)
@@ -145,4 +153,4 @@ set_lowest_price_to_small_packages(structured_transactions_array)
 set_discount(structured_transactions_array)
 round_down_to_monthly_discount_limit(structured_transactions_array)
 
-puts structured_transactions_array
+structured_response(structured_transactions_array)
