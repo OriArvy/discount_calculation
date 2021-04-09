@@ -129,14 +129,20 @@ end
 
 def calculate_total_discount(items)
   counter = 0
+  index_provided = 0
   items.each_with_index do |item, index|
-    if DateTime.parse(item['Date']).month == DateTime.parse(items[index - 1]['Date']).month && (item['Discount'] != '-' && item['Discount'] != 'IGNORED!')
-      counter += item['Discount'].to_f
-      item['TotalDiscount'] = counter
-    elsif item['Discount'] != '-' && item['Discount'] != 'IGNORED!'
-      counter = 0
-      counter = item['Discount'].to_f
-      item['TotalDiscount'] = counter
+    if valid_date?(item['Date']) && valid_date?(items[index - 1]['Date'])
+      if DateTime.parse(item['Date']).month == DateTime.parse(items[index - 1]['Date']).month && (item['Discount'] != '-' && item['Discount'] != 'IGNORED!')
+        counter += item['Discount'].to_f
+        item['TotalDiscount'] = counter
+        index_provided = 1
+
+      elsif item['Discount'] != '-' && item['Discount'] != 'IGNORED!'
+        counter = 0
+        counter = item['Discount'].to_f
+        item['TotalDiscount'] = counter
+        index_provided = 1
+      end
     end
   end
 end
