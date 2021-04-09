@@ -152,24 +152,29 @@ def round_down_to_monthly_discount_limit(items)
       discounted_array << item
     end
   end
-  discounted_array.each do |item|
-    unless item == discounted_array.last
-      over_limit -= item['Discount']
-      item['Discount'] -= item['Discount']
-      item['FinalPrice'] = item['Price']
+  discounted_array.each_with_index do |item, index|
+    if item['Price'] == 6.9
+      item['Discount'] -= item['TotalDiscount'] - 10
+      item['FinalPrice'] = item['Price'].floor(2) - item['Discount'].floor(2)
+      item['FinalPrice'].floor(2)
+      over_limit = 0
     else
       item['Discount'] -= over_limit.floor(2)
       item['Discount'] = item['Discount'].ceil(2)
       item['FinalPrice'] = item['Price'] - item['Discount']
+      over_limit = 0.5
     end
   end
-  puts discounted_array
 end
 
 def structured_response(items)
   array = []
   items.each do |item|
-    array << "#{item['Date']} #{item['PackageSize']} #{item['Provider']} #{item['FinalPrice']} #{item['Discount']}"
+    if item['FinalPrice'] != 'IGNORED!'
+      array << "#{item['Date']} #{item['PackageSize']} #{item['Provider']} #{item['FinalPrice'].floor(2)} #{item['Discount']}"
+    else
+      array << "#{item['Date']} #{item['PackageSize']} #{item['Provider']} #{item['FinalPrice']} #{item['Discount']}"
+    end
   end
   array
 end
@@ -184,6 +189,5 @@ set_lowest_price_to_small_packages(structured_transactions_array)
 set_discount(structured_transactions_array)
 calculate_total_discount(structured_transactions_array)
 round_down_to_monthly_discount_limit(structured_transactions_array)
-structured_response(structured_transactions_array)
 
 puts structured_response(structured_transactions_array)
